@@ -14,6 +14,7 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         
         view.backgroundColor = .red
+        print(L10n.NewsList.empty)
     }
 
 

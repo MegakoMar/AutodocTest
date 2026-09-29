@@ -1,0 +1,9 @@
+/* 
+  Localizable.strings
+  AutodocTest
+
+  Created by Roman Komarov on 29.09.2026.
+  
+*/
+
+"news-list.empty" = "В данный момент ничего нет";
