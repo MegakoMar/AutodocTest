@@ -3,6 +3,7 @@ BREW := /opt/homebrew/bin/brew
 ## swiftgen: Trigger code generation from assets with swiftgen tool
 bootstrap:
 	mint install SwiftGen/SwiftGen
+	swiftgen
 
 swiftgen:
 	mint run swiftgen

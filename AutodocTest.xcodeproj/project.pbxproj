@@ -65,7 +65,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 57824F98306BB25800EFF43F /* Build configuration list for PBXNativeTarget "AutodocTest" */;
 			buildPhases = (
-				5753DD2A306BC9340012BBFB /* Swiftgen */,
 				57824F81306BB25800EFF43F /* Sources */,
 				57824F82306BB25800EFF43F /* Frameworks */,
 				57824F83306BB25800EFF43F /* Resources */,
@@ -127,27 +126,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		5753DD2A306BC9340012BBFB /* Swiftgen */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = Swiftgen;
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\nif which swiftgen >/dev/null; then\n  swiftgen\nelse\n  echo \"warning: SwiftGen not installed , download from https://github.com\"\nfi\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		57824F81306BB25800EFF43F /* Sources */ = {

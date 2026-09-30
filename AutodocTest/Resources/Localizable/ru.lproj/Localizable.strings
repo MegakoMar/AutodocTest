@@ -6,4 +6,13 @@
   
 */
 
+// Error
+
+"error.invalid-url" = "Неверный URL адрес.";
+"error.no-data" = "Сервер не вернул данных.";
+"error.decoding-error" = "Ошибка обработки данных: %@";
+"error.network-error" = "Ошибка сети: %@";
+"error.unexpected-status-code" = "Неожиданный статус-код: %@";
+"error.unknown" = "Произошла неизвестная ошибка.";
+
 "news-list.empty" = "В данный момент ничего нет";
