@@ -110,7 +110,7 @@ final class NewsListViewController: UIViewController {
         }
         
         switch state {
-        case let .loaded(items, _, isRefreshing):
+        case let .loaded(items, isRefreshing):
             applySnapshot(items: items, isRefreshing: isRefreshing)
         case let .error(errorMessage, items):
             if !items.isEmpty {
@@ -204,7 +204,6 @@ final class NewsListViewController: UIViewController {
     }
     
     private func applySnapshot(items: [NewsItem] = [], isRefreshing: Bool = false, animate: Bool = true) {
-        print("ITEMS \(items.count)")
         var snapshot = Snapshot()
         snapshot.appendSections([.main])
         snapshot.appendItems(items, toSection: .main)

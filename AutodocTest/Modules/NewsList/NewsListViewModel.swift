@@ -17,6 +17,8 @@ final class NewsListViewModel {
     private let networkService: NewsNetworkService
     private var totalCount = 0
     private var cancellables = Set<AnyCancellable>()
+    private var currentPage: Int = 1
+    private var hasMorePages: Bool = true
     
     // MARK: - Initialization
     init(networkService: NewsNetworkService) {
@@ -40,10 +42,11 @@ final class NewsListViewModel {
             } else {
                 state = .loaded(
                     items: result.news,
-                    nextPage: result.news.count < result.totalCount ? 2 : nil,
                     isRefreshing: isRefreshing
                 )
             }
+            currentPage += 1
+            hasMorePages = !result.news.isEmpty
             
         } catch {
             state = .error(errorMessage: error.localizedDescription)
@@ -51,22 +54,21 @@ final class NewsListViewModel {
     }
     
     func loadNextPage() async {
-        guard !state.isLoading,
-            case let .loaded(items, nextPage, _) = state,
-            let page = nextPage
-        else {
+        guard !state.isLoading, case let .loaded(items, _) = state, hasMorePages else {
             return
         }
         
-        state = .loadingMore(items: items, nextPage: page)
+        state = .loadingMore(items: items)
         
         do {
-            let result = try await networkService.fetchNews(page: page)
+            let result = try await networkService.fetchNews(page: currentPage)
             let newItems = items + result.news
-            state = .loaded(items: newItems, nextPage: page)
+            state = .loaded(items: newItems)
+            currentPage += 1
+            hasMorePages = newItems.count < result.totalCount
         } catch {
             // Показать ошибку
-            state = .loaded(items: items, nextPage: nextPage)
+            state = .loaded(items: items)
         }
     }
     

@@ -22,6 +22,7 @@ final class NewsNetworkServiceImp: NewsNetworkService {
     
     func fetchNews(page: Int = 1, pageSize: Int = 15) async throws -> NewsResponse {
         let urlStr = "\(baseURLString)\(page)/\(pageSize)"
+        print("[URL] \(urlStr)")
         
         guard let url = URL(string: urlStr) else {
             throw APIError.invalidURL

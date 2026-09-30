@@ -10,8 +10,8 @@ import Foundation
 enum NewsListState {
     case idle
     case loading
-    case loaded(items: [NewsItem], nextPage: Int?, isRefreshing: Bool = false)
-    case loadingMore(items: [NewsItem], nextPage: Int?)
+    case loaded(items: [NewsItem], isRefreshing: Bool = false)
+    case loadingMore(items: [NewsItem])
     case error(errorMessage: String, items: [NewsItem] = [])
     case empty
     
@@ -26,19 +26,10 @@ enum NewsListState {
     
     var currentItems: [NewsItem] {
         switch self {
-        case let .loaded(items, _, _), let .loadingMore(items, _), let .error(_, items):
+        case let .loaded(items, _), let .loadingMore(items), let .error(_, items):
             return items
         default:
             return []
-        }
-    }
-    
-    var hasMorePages: Bool {
-        switch self {
-        case let .loaded(_, nextPage, _), let .loadingMore(_, nextPage):
-            return nextPage != nil
-        default:
-            return false
         }
     }
 }
