@@ -15,14 +15,16 @@ final class NewsListViewModel {
     
     // MARK: - Private
     private let networkService: NewsNetworkService
+    private let router: NewsListRouter
     private var totalCount = 0
     private var cancellables = Set<AnyCancellable>()
     private var currentPage: Int = 1
     private var hasMorePages: Bool = true
     
     // MARK: - Initialization
-    init(networkService: NewsNetworkService) {
+    init(networkService: NewsNetworkService, router: NewsListRouter) {
         self.networkService = networkService
+        self.router = router
     }
     
     func loadFirstPage(isRefreshing: Bool = false) async {
@@ -74,5 +76,9 @@ final class NewsListViewModel {
     
     func refresh() async {
         await loadFirstPage(isRefreshing: true)
+    }
+    
+    func showDetails(for fullUrl: String) {
+        router.showDetails(for: fullUrl)
     }
 }

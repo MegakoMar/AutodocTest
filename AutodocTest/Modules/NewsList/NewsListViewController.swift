@@ -230,6 +230,6 @@ extension NewsListViewController: UICollectionViewDelegate {
             return
         }
         
-        print(item.fullUrl)
+        viewModel.showDetails(for: item.fullUrl)
     }
 }

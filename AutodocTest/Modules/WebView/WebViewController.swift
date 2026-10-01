@@ -16,6 +16,7 @@ final class WebViewController: UIViewController {
         
         let webView = WKWebView(frame: view.bounds, configuration: configuration)
         webView.navigationDelegate = self
+        webView.translatesAutoresizingMaskIntoConstraints = false
         return webView
     }()
     
@@ -40,6 +41,8 @@ final class WebViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        setupUI()
         
         if let url = URL(string: fullUrl) {
             webView.load(URLRequest(url: url))
