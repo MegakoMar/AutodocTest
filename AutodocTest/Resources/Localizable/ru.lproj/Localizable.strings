@@ -15,4 +15,10 @@
 "error.unexpected-status-code" = "Неожиданный статус-код: %@";
 "error.unknown" = "Произошла неизвестная ошибка.";
 
+// NewsList
+
 "news-list.empty" = "В данный момент ничего нет";
+
+// Button
+
+"button.retry" = "Повторить";

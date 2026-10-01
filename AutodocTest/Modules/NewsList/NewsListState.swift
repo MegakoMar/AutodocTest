@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NewsListState {
+enum NewsListState: Equatable {
     case idle
     case loading
     case loaded(items: [NewsItem], isRefreshing: Bool = false)

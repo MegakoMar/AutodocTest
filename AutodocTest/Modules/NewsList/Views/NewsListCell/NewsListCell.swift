@@ -13,6 +13,7 @@ final class NewsListCell: UICollectionViewCell {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .bold)
+        label.textColor = .black
         label.numberOfLines = 0
         return label
     }()
@@ -44,7 +45,7 @@ final class NewsListCell: UICollectionViewCell {
     }
     
     // MARK: - Configuration
-    
+
     func configure(with item: NewsListCellData) {
         titleLabel.text = item.title
     }

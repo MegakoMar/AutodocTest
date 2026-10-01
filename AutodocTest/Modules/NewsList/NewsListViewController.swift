@@ -38,6 +38,13 @@ final class NewsListViewController: UIViewController {
         return indicator
     }()
     
+    private lazy var errorView: ErrorView = {
+        let errorView = ErrorView()
+        errorView.isHidden = true
+        errorView.translatesAutoresizingMaskIntoConstraints = false
+        return errorView
+    }()
+    
     private var viewModel: NewsListViewModel
     private var cancellables = Set<AnyCancellable>()
     
@@ -77,14 +84,21 @@ final class NewsListViewController: UIViewController {
         
         view.addSubview(collectionView)
         view.addSubview(activityIndicator)
+        view.addSubview(errorView)
         
         NSLayoutConstraint.activate([
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            errorView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            errorView.topAnchor.constraint(equalTo: view.topAnchor),
+            errorView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            errorView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
     
@@ -117,12 +131,32 @@ final class NewsListViewController: UIViewController {
                 applySnapshot(items: items)
                 // Показать снек
             } else {
-                // Показать состояние полноэкранной ошибки
+                errorView.congigure(
+                    with: .init(message: errorMessage, type: .error) { [weak self] in
+                        Task {
+                            await self?.viewModel.loadFirstPage()
+                        }
+                    }
+                )
             }
-//        case .empty:
-//            // Показать пустое состояние
+        case .empty:
+            errorView.congigure(
+                with: .init(message: L10n.NewsList.empty) { [weak self] in
+                    Task {
+                        await self?.viewModel.loadFirstPage()
+                    }
+                }
+            )
         default:
             return
+        }
+        
+        if case .error = state {
+            errorView.isHidden = false
+        } else if case .empty = state {
+            errorView.isHidden = false
+        } else {
+            errorView .isHidden = true
         }
     }
     
