@@ -10,10 +10,15 @@ import UIKit
 final class ImageLoader {
     // MARK: - Private
     
-    private let cache = URLCache.shared
+    private let cache: URLCache
     private var cacheLock = NSLock()
     
-    private init() {}
+    private init() {
+        cache = URLCache(
+            memoryCapacity: 50 * 1024 * 1024,
+            diskCapacity: 200 * 1024 * 1024
+        )
+    }
     
     static let shared = ImageLoader()
     
@@ -22,8 +27,7 @@ final class ImageLoader {
             return nil
         }
         
-        let request = URLRequest(url: url)
-        
+        let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
         let (data, response) = try await URLSession.shared.data(for: request)
         let cachedResponse = CachedURLResponse(response: response, data: data)
         cache.storeCachedResponse(cachedResponse, for: request)
@@ -45,12 +49,6 @@ final class ImageLoader {
     }
     
     private func requestFromCache(_ request: URLRequest) -> UIImage? {
-        cacheLock.lock()
-        
-        defer {
-            cacheLock.unlock()
-        }
-        
         guard let data = cache.cachedResponse(for: request)?.data, let image = UIImage(data: data) else {
             return nil
         }

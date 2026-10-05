@@ -165,14 +165,14 @@ final class NewsListViewController: UIViewController {
         UICollectionViewCompositionalLayout { _,_ in
             let itemSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(150)
+                heightDimension: .estimated(300)
             )
             
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
             
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(150)
+                heightDimension: .estimated(300)
             )
             
             let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])

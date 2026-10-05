@@ -18,8 +18,18 @@ final class NewsListCell: UICollectionViewCell {
         return label
     }()
     
+    private lazy var imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.image = NewsListCell.placeholder
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.tintColor = .gray
+        return imageView
+    }()
+    
     private lazy var stackView: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [titleLabel])
+        let stack = UIStackView(arrangedSubviews: [imageView, titleLabel])
         stack.axis = .vertical
         stack.alignment = .fill
         stack.distribution = .fill
@@ -28,7 +38,13 @@ final class NewsListCell: UICollectionViewCell {
         return stack
     }()
     
+    private static let placeholder = UIImage(systemName: "photo.fill")
+    
+    private var currentImageUrl: String?
+    private var imageLoadTask: Task<Void, Never>?
+    
     // MARK: - Initialization
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -41,13 +57,39 @@ final class NewsListCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
+        imageLoadTask?.cancel()
+        imageLoadTask = nil
+        imageView.image = NewsListCell.placeholder
         titleLabel.text = nil
+        currentImageUrl = nil
     }
     
     // MARK: - Configuration
 
     func configure(with item: NewsListCellData) {
         titleLabel.text = item.title
+        currentImageUrl = item.imageUrl
+        
+        if let cached = ImageLoader.shared.cachedImage(from: item.imageUrl) {
+            imageView.image = cached
+            imageLoadTask?.cancel()
+            imageLoadTask = nil
+            return
+        }
+        
+        imageView.image = NewsListCell.placeholder
+        imageLoadTask?.cancel()
+        
+        let imageUrl = item.imageUrl
+        imageLoadTask = Task { @MainActor [weak self] in
+            let image = try? await ImageLoader.shared.loadImage(from: imageUrl)
+            
+            guard let self, !Task.isCancelled, currentImageUrl == imageUrl  else {
+                return
+            }
+            
+            imageView.image = image ?? NewsListCell.placeholder
+        }
     }
     
     // MARK: - Setup
@@ -63,6 +105,13 @@ final class NewsListCell: UICollectionViewCell {
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
         ])
+        
+        let aspect = imageView.heightAnchor.constraint(
+            equalTo: imageView.widthAnchor,
+            multiplier: 2.0 / 3.0
+        )
+        aspect.priority = .defaultHigh
+        aspect.isActive = true
     }
 }
 

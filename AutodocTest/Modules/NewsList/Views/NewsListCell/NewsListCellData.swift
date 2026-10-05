@@ -8,7 +8,6 @@
 import Foundation
 
 struct NewsListCellData {
-    let id: Int
     let title: String
     let imageUrl: String?
 }
