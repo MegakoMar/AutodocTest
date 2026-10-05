@@ -104,14 +104,8 @@ final class NewsListCell: UICollectionViewCell {
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 2.0 / 3.0),
         ])
-        
-        let aspect = imageView.heightAnchor.constraint(
-            equalTo: imageView.widthAnchor,
-            multiplier: 2.0 / 3.0
-        )
-        aspect.priority = .defaultHigh
-        aspect.isActive = true
     }
 }
 

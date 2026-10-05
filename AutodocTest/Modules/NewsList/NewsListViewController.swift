@@ -195,7 +195,6 @@ final class NewsListViewController: UIViewController {
             
             cell.configure(
                 with: .init(
-                    id: item.id,
                     title: item.title,
                     imageUrl: item.titleImageUrl
                 )
