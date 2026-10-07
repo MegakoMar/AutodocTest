@@ -10,4 +10,5 @@ import Foundation
 struct NewsListCellData {
     let title: String
     let imageUrl: String?
+    let needDivider: Bool
 }

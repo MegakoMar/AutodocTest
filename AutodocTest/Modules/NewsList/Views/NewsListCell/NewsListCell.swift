@@ -29,13 +29,20 @@ final class NewsListCell: UICollectionViewCell {
     }()
     
     private lazy var stackView: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [imageView, titleLabel])
+        let stack = UIStackView(arrangedSubviews: [imageView, titleLabel, dividerView])
         stack.axis = .vertical
         stack.alignment = .fill
         stack.distribution = .fill
         stack.spacing = 10
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
+    }()
+    
+    private lazy var dividerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemGray5
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
     private static let placeholder = UIImage(systemName: "photo.fill")
@@ -90,6 +97,8 @@ final class NewsListCell: UICollectionViewCell {
             
             imageView.image = image ?? NewsListCell.placeholder
         }
+        
+        dividerView.isHidden = !item.needDivider
     }
     
     // MARK: - Setup
@@ -100,11 +109,12 @@ final class NewsListCell: UICollectionViewCell {
         contentView.addSubview(stackView)
         
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            stackView.topAnchor.constraint(equalTo: contentView.topAnchor),
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5),
             imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 2.0 / 3.0),
+            dividerView.heightAnchor.constraint(equalToConstant: 1),
         ])
     }
 }
@@ -114,5 +124,45 @@ final class NewsListCell: UICollectionViewCell {
 extension NewsListCell {
     static var reuseIdentifier: String {
         String(describing: self)
+    }
+}
+
+// MARK: - Layout
+
+extension NewsListCell {
+    static func layout() -> UICollectionViewCompositionalLayout {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(300)
+        )
+        
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(300)
+        )
+        
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 10
+        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0)
+        
+        let footerSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .absolute(30)
+        )
+        
+        let footer = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: footerSize,
+            elementKind: UICollectionView.elementKindSectionFooter,
+            alignment: .bottom
+        )
+        
+        let config = UICollectionViewCompositionalLayoutConfiguration()
+        config.boundarySupplementaryItems = [footer]
+        
+        return UICollectionViewCompositionalLayout(section: section, configuration: config)
     }
 }

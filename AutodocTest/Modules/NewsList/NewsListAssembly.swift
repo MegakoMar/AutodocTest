@@ -12,7 +12,7 @@ enum NewsListAssembly {
     static func makeModule(navigationController: UINavigationController?) -> UIViewController {
         let networkService: NewsNetworkService = NewsNetworkServiceImp()
         let router: NewsListRouter = NewsListRouterImp(navigationController: navigationController)
-        let newsListViewModel = NewsListViewModel(networkService: networkService, router: router)
+        let newsListViewModel: NewsListViewModel = NewsListViewModelImp(networkService: networkService, router: router)
         let newsListViewController = NewsListViewController(viewModel: newsListViewModel)
         
         return newsListViewController

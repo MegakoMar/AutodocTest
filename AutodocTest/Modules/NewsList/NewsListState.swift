@@ -11,8 +11,8 @@ enum NewsListState: Equatable {
     case idle
     case loading
     case loaded(items: [NewsItem], isRefreshing: Bool = false)
-    case loadingMore(items: [NewsItem])
-    case error(errorMessage: String, items: [NewsItem] = [])
+    case loadingMore
+    case error(errorMessage: String)
     case empty
     
     var isLoading: Bool {
@@ -21,15 +21,6 @@ enum NewsListState: Equatable {
             return true
         default:
             return false
-        }
-    }
-    
-    var currentItems: [NewsItem] {
-        switch self {
-        case let .loaded(items, _), let .loadingMore(items), let .error(_, items):
-            return items
-        default:
-            return []
         }
     }
 }

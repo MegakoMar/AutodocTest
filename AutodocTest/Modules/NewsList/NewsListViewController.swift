@@ -9,23 +9,23 @@ import Combine
 import UIKit
 
 final class NewsListViewController: UIViewController {
-    // MARK: Private
+    // MARK: - Private
     
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
             frame: .zero,
-            collectionViewLayout: createCompositionalLayout()
+            collectionViewLayout: NewsListCell.layout()
         )
         collectionView.backgroundColor = .white
         collectionView.showsVerticalScrollIndicator = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.register(NewsListCell.self, forCellWithReuseIdentifier: NewsListCell.reuseIdentifier)
-//        collectionView.register(
-//            LoadingFooterView.self,
-//            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-//            withReuseIdentifier: LoadingFooterView.reuseIdentifier
-//        )
+        collectionView.register(
+            LoadingFooterView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+            withReuseIdentifier: LoadingFooterView.reuseIdentifier
+        )
         return collectionView
     }()
     
@@ -57,6 +57,8 @@ final class NewsListViewController: UIViewController {
         case main
     }
     
+    // MARK: - Initialization
+    
     init(viewModel: NewsListViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -77,6 +79,18 @@ final class NewsListViewController: UIViewController {
         Task { [weak self] in
             await self?.viewModel.loadFirstPage()
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationController?.navigationBar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        navigationController?.navigationBar.isHidden = false
     }
     
     private func setupUI() {
@@ -108,7 +122,7 @@ final class NewsListViewController: UIViewController {
     }
     
     private func setupBindings() {
-        viewModel.$state
+        viewModel.statePublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 self?.handleState(state)
@@ -126,19 +140,14 @@ final class NewsListViewController: UIViewController {
         switch state {
         case let .loaded(items, isRefreshing):
             applySnapshot(items: items, isRefreshing: isRefreshing)
-        case let .error(errorMessage, items):
-            if !items.isEmpty {
-                applySnapshot(items: items)
-                // Показать снек
-            } else {
-                errorView.congigure(
-                    with: .init(message: errorMessage, type: .error) { [weak self] in
-                        Task {
-                            await self?.viewModel.loadFirstPage()
-                        }
+        case let .error(errorMessage):
+            errorView.congigure(
+                with: .init(message: errorMessage, type: .error) { [weak self] in
+                    Task {
+                        await self?.viewModel.loadFirstPage()
                     }
-                )
-            }
+                }
+            )
         case .empty:
             errorView.congigure(
                 with: .init(message: L10n.NewsList.empty) { [weak self] in
@@ -160,33 +169,8 @@ final class NewsListViewController: UIViewController {
         }
     }
     
-    // MARK: - Layout
-    private func createCompositionalLayout() -> UICollectionViewCompositionalLayout {
-        UICollectionViewCompositionalLayout { _,_ in
-            let itemSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(300)
-            )
-            
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            
-            let groupSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(300)
-            )
-            
-            let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-            
-            let section = NSCollectionLayoutSection(group: group)
-            
-            section.interGroupSpacing = 10
-            section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0)
-            
-            return section
-        }
-    }
-    
     // MARK: - DataSource
+    
     private func createDataSoucre() -> DataSource {
         let dataSource = DataSource(collectionView: collectionView) { [weak self] (collectionView, indexPath, item) in
             guard let self, let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsListCell.reuseIdentifier, for: indexPath) as? NewsListCell else {
@@ -196,7 +180,8 @@ final class NewsListViewController: UIViewController {
             cell.configure(
                 with: .init(
                     title: item.title,
-                    imageUrl: item.titleImageUrl
+                    imageUrl: item.titleImageUrl,
+                    needDivider: item != self.dataSource.snapshot().itemIdentifiers[self.dataSource.snapshot().numberOfItems - 1]
                 )
             )
             
@@ -211,27 +196,27 @@ final class NewsListViewController: UIViewController {
             return cell
         }
         
-//        dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
-//            guard let self, kind == UICollectionView.elementKindSectionFooter else {
-//                return nil
-//            }
-//            
-//            guard let footer = collectionView.dequeueReusableSupplementaryView(
-//                ofKind: kind,
-//                withReuseIdentifier: LoadingFooterView.reuseIdentifier,
-//                for: indexPath
-//            ) as? LoadingFooterView else {
-//                return UICollectionReusableView()
-//            }
-//            
-//            if case .loadingMore = self.viewModel.state {
-//                footer.startAnimating()
-//            } else {
-//                footer.stopAnimating()
-//            }
-//            
-//            return footer
-//        }
+        dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
+            guard let self, kind == UICollectionView.elementKindSectionFooter else {
+                return nil
+            }
+            
+            guard let footer = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: LoadingFooterView.reuseIdentifier,
+                for: indexPath
+            ) as? LoadingFooterView else {
+                return UICollectionReusableView()
+            }
+            
+            if case .loadingMore = self.viewModel.state {
+                footer.startAnimating()
+            } else {
+                footer.stopAnimating()
+            }
+            
+            return footer
+        }
         
         return dataSource
     }
@@ -257,6 +242,7 @@ final class NewsListViewController: UIViewController {
 }
 
 // MARK: - UICollectionViewDelegate
+
 extension NewsListViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let item = dataSource.itemIdentifier(for: indexPath) else {
