@@ -12,6 +12,7 @@ import Combine
 protocol NewsListViewModel: AnyObject {
     var state: NewsListState { get }
     var statePublisher: AnyPublisher<NewsListState, Never> { get }
+    var errorSnackPublisher: AnyPublisher<String, Never> { get }
     
     func loadFirstPage(isRefreshing: Bool) async
     func loadNextPage() async

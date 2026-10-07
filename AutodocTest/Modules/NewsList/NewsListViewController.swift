@@ -93,6 +93,8 @@ final class NewsListViewController: UIViewController {
         navigationController?.navigationBar.isHidden = false
     }
     
+    // MARK: - Setup
+    
     private func setupUI() {
         view.backgroundColor = .white
         
@@ -126,6 +128,17 @@ final class NewsListViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 self?.handleState(state)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.errorSnackPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] message in
+                guard let self else {
+                    return
+                }
+                
+                Snackbar.show(message: message, in: self.view)
             }
             .store(in: &cancellables)
     }
@@ -197,15 +210,15 @@ final class NewsListViewController: UIViewController {
         }
         
         dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
-            guard let self, kind == UICollectionView.elementKindSectionFooter else {
-                return nil
-            }
-            
-            guard let footer = collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: LoadingFooterView.reuseIdentifier,
-                for: indexPath
-            ) as? LoadingFooterView else {
+            guard
+                let self,
+                kind == UICollectionView.elementKindSectionFooter,
+                let footer = collectionView.dequeueReusableSupplementaryView(
+                    ofKind: kind,
+                    withReuseIdentifier: LoadingFooterView.reuseIdentifier,
+                    for: indexPath
+                ) as? LoadingFooterView
+            else {
                 return UICollectionReusableView()
             }
             
@@ -233,6 +246,8 @@ final class NewsListViewController: UIViewController {
             self.refreshControl.endRefreshing()
         }
     }
+    
+    // MARK: - Action
     
     @objc private func refreshPulled() {
         Task { [weak self] in

@@ -17,18 +17,25 @@ final class NewsListViewModelImp: NewsListViewModel {
         $state.eraseToAnyPublisher()
     }
     
+    var errorSnackPublisher: AnyPublisher<String, Never> {
+        errorSnackMessageSubject.eraseToAnyPublisher()
+    }
+    
     // MARK: - Private
     private let networkService: NewsNetworkService
     private let router: NewsListRouter
     private var totalCount = 0
     private var currentPage: Int = 1
     private var hasMorePages: Bool = true
+    private let errorSnackMessageSubject = PassthroughSubject<String, Never>()
     
     // MARK: - Initialization
     init(networkService: NewsNetworkService, router: NewsListRouter) {
         self.networkService = networkService
         self.router = router
     }
+    
+    // MARK: - NewsListViewModel
     
     func loadFirstPage(isRefreshing: Bool = false) async {
         guard !state.isLoading else {
@@ -72,8 +79,8 @@ final class NewsListViewModelImp: NewsListViewModel {
             currentPage += 1
             hasMorePages = newItems.count < result.totalCount
         } catch {
-            // Показать ошибку
             state = .loaded(items: items)
+            errorSnackMessageSubject.send(error.localizedDescription)
         }
     }
     
