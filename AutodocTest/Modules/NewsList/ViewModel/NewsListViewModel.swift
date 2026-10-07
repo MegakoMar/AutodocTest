@@ -14,14 +14,14 @@ protocol NewsListViewModel: AnyObject {
     var statePublisher: AnyPublisher<NewsListState, Never> { get }
     var errorSnackPublisher: AnyPublisher<String, Never> { get }
     
-    func loadFirstPage(isRefreshing: Bool) async
-    func loadNextPage() async
-    func refresh() async
+    func loadFirstPage(isRefreshing: Bool)
+    func loadNextPage()
+    func refresh()
     func showDetails(for fullUrl: String)
 }
 
 extension NewsListViewModel {
-    func loadFirstPage() async {
-        await loadFirstPage(isRefreshing: false)
+    func loadFirstPage() {
+        loadFirstPage(isRefreshing: false)
     }
 }

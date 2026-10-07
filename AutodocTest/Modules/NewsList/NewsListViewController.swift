@@ -26,10 +26,15 @@ final class NewsListViewController: UIViewController {
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
             withReuseIdentifier: LoadingFooterView.reuseIdentifier
         )
+        collectionView.refreshControl = refreshControl
         return collectionView
     }()
     
-    private lazy var refreshControl = UIRefreshControl()
+    private lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshPulled), for: .valueChanged)
+        return refreshControl
+    }()
     
     private lazy var activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
@@ -73,12 +78,9 @@ final class NewsListViewController: UIViewController {
         
         setupUI()
         setupBindings()
-        setupRefreshControl()
         applySnapshot(animate: false)
         
-        Task { [weak self] in
-            await self?.viewModel.loadFirstPage()
-        }
+        viewModel.loadFirstPage()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -118,11 +120,6 @@ final class NewsListViewController: UIViewController {
         ])
     }
     
-    private func setupRefreshControl() {
-        refreshControl.addTarget(self, action: #selector(refreshPulled), for: .valueChanged)
-        collectionView.refreshControl = refreshControl
-    }
-    
     private func setupBindings() {
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
@@ -156,17 +153,13 @@ final class NewsListViewController: UIViewController {
         case let .error(errorMessage):
             errorView.congigure(
                 with: .init(message: errorMessage, type: .error) { [weak self] in
-                    Task {
-                        await self?.viewModel.loadFirstPage()
-                    }
+                    self?.viewModel.loadFirstPage()
                 }
             )
         case .empty:
             errorView.congigure(
                 with: .init(message: L10n.NewsList.empty) { [weak self] in
-                    Task {
-                        await self?.viewModel.loadFirstPage()
-                    }
+                    self?.viewModel.loadFirstPage()
                 }
             )
         default:
@@ -201,9 +194,7 @@ final class NewsListViewController: UIViewController {
             let itemsCount = self.dataSource.snapshot().numberOfItems
 
             if indexPath.item == itemsCount - 3 && itemsCount > 0 {
-                Task { [weak self] in
-                   await self?.viewModel.loadNextPage()
-                }
+                self.viewModel.loadNextPage()
             }
             
             return cell
@@ -250,9 +241,7 @@ final class NewsListViewController: UIViewController {
     // MARK: - Action
     
     @objc private func refreshPulled() {
-        Task { [weak self] in
-            await self?.viewModel.refresh()
-        }
+        viewModel.refresh()
     }
 }
 

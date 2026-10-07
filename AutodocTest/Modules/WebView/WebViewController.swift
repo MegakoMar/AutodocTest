@@ -15,6 +15,7 @@ final class WebViewController: UIViewController {
         let configuration = WKWebViewConfiguration()
         
         let webView = WKWebView(frame: view.bounds, configuration: configuration)
+        webView.backgroundColor = .white
         webView.navigationDelegate = self
         webView.translatesAutoresizingMaskIntoConstraints = false
         return webView
@@ -28,6 +29,8 @@ final class WebViewController: UIViewController {
     }()
     
     private let fullUrl: String
+    
+    // MARK: - Initialization
     
     init(fullUrl: String) {
         self.fullUrl = fullUrl
@@ -49,6 +52,8 @@ final class WebViewController: UIViewController {
         }
     }
     
+    // MARK: - Setup
+    
     private func setupUI() {
         view.backgroundColor = .white
         
@@ -67,6 +72,7 @@ final class WebViewController: UIViewController {
 }
 
 // MARK: - WKNavigationDelegate
+
 extension WebViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         activityIndicator.startAnimating()

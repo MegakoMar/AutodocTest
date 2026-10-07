@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct NewsResponse: Decodable {
+struct NewsResponse: Decodable, Sendable {
     let news: [NewsItem]
     let totalCount: Int
 }

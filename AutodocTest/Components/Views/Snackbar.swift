@@ -42,7 +42,6 @@ final class Snackbar: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         setupUI()
     }
     
@@ -61,10 +60,10 @@ final class Snackbar: UIView {
         addSubview(messageLabel)
         
         NSLayoutConstraint.activate([
-            messageLabel.topAnchor.constraint(equalTo: topAnchor, constant: 10),
             messageLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            messageLabel.topAnchor.constraint(equalTo: topAnchor, constant: 10),
+            messageLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             messageLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
-            messageLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16)
         ])
     }
     

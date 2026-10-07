@@ -19,6 +19,14 @@ internal enum L10n {
     internal static func decodingError(_ p1: Any) -> String {
       return L10n.tr("Localizable", "error.decoding-error", String(describing: p1), fallback: "Ошибка обработки данных: %@")
     }
+    /// Ошибка кодирования данных: %@
+    internal static func encodingError(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "error.encoding-error", String(describing: p1), fallback: "Ошибка кодирования данных: %@")
+    }
+    /// Доступ запрещен.
+    internal static let forbidden = L10n.tr("Localizable", "error.forbidden", fallback: "Доступ запрещен.")
+    /// Неверный ответ от сервера.
+    internal static let invalidResponse = L10n.tr("Localizable", "error.invalid-response", fallback: "Неверный ответ от сервера.")
     /// Localizable.strings
     ///   AutodocTest
     /// 
@@ -30,6 +38,14 @@ internal enum L10n {
     }
     /// Сервер не вернул данных.
     internal static let noData = L10n.tr("Localizable", "error.no-data", fallback: "Сервер не вернул данных.")
+    /// Ресурс не найден.
+    internal static let notFound = L10n.tr("Localizable", "error.notFound", fallback: "Ресурс не найден.")
+    /// Ошибка сервера: %@
+    internal static func serverError(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "error.server-error", String(describing: p1), fallback: "Ошибка сервера: %@")
+    }
+    /// Требуется авторизация.
+    internal static let unauthorized = L10n.tr("Localizable", "error.unauthorized", fallback: "Требуется авторизация.")
     /// Неожиданный статус-код: %@
     internal static func unexpectedStatusCode(_ p1: Any) -> String {
       return L10n.tr("Localizable", "error.unexpected-status-code", String(describing: p1), fallback: "Неожиданный статус-код: %@")

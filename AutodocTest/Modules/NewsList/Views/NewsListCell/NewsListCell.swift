@@ -40,7 +40,7 @@ final class NewsListCell: UICollectionViewCell {
     
     private lazy var dividerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemGray5
+        view.backgroundColor = .gray
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()

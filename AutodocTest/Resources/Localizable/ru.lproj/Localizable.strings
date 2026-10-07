@@ -9,10 +9,16 @@
 // Error
 
 "error.invalid-url" = "Неверный URL адрес.";
+"error.invalid-response" = "Неверный ответ от сервера.";
 "error.no-data" = "Сервер не вернул данных.";
 "error.decoding-error" = "Ошибка обработки данных: %@";
+"error.encoding-error" = "Ошибка кодирования данных: %@";
 "error.network-error" = "Ошибка сети: %@";
+"error.server-error" = "Ошибка сервера: %@";
 "error.unexpected-status-code" = "Неожиданный статус-код: %@";
+"error.unauthorized" = "Требуется авторизация.";
+"error.forbidden" = "Доступ запрещен.";
+"error.notFound" = "Ресурс не найден.";
 "error.unknown" = "Произошла неизвестная ошибка.";
 
 // NewsList

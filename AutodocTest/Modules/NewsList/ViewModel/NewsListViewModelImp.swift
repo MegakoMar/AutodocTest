@@ -22,6 +22,7 @@ final class NewsListViewModelImp: NewsListViewModel {
     }
     
     // MARK: - Private
+    
     private let networkService: NewsNetworkService
     private let router: NewsListRouter
     private var totalCount = 0
@@ -30,6 +31,7 @@ final class NewsListViewModelImp: NewsListViewModel {
     private let errorSnackMessageSubject = PassthroughSubject<String, Never>()
     
     // MARK: - Initialization
+    
     init(networkService: NewsNetworkService, router: NewsListRouter) {
         self.networkService = networkService
         self.router = router
@@ -37,7 +39,7 @@ final class NewsListViewModelImp: NewsListViewModel {
     
     // MARK: - NewsListViewModel
     
-    func loadFirstPage(isRefreshing: Bool = false) async {
+    func loadFirstPage(isRefreshing: Bool = false) {
         guard !state.isLoading else {
             return
         }
@@ -45,47 +47,58 @@ final class NewsListViewModelImp: NewsListViewModel {
         totalCount = 0
         state = .loading
         
-        do {
-            let result = try await networkService.fetchNews(page: 1)
-            totalCount = result.totalCount
-            
-            if result.news.isEmpty {
-                state = .empty
-            } else {
-                state = .loaded(
-                    items: result.news,
-                    isRefreshing: isRefreshing
-                )
+        Task { [weak self] in
+            guard let self else {
+                return
             }
-            currentPage += 1
-            hasMorePages = !result.news.isEmpty
             
-        } catch {
-            state = .error(errorMessage: error.localizedDescription)
+            do {
+                let result = try await networkService.fetchNews(page: 1)
+                totalCount = result.totalCount
+                
+                if result.news.isEmpty {
+                    state = .empty
+                } else {
+                    state = .loaded(
+                        items: result.news,
+                        isRefreshing: isRefreshing
+                    )
+                }
+                currentPage += 1
+                hasMorePages = !result.news.isEmpty
+            } catch {
+                state = .error(errorMessage: error.localizedDescription)
+            }
         }
     }
     
-    func loadNextPage() async {
+    func loadNextPage() {
         guard !state.isLoading, case let .loaded(items, _) = state, hasMorePages else {
             return
         }
         
         state = .loadingMore
         
-        do {
-            let result = try await networkService.fetchNews(page: currentPage)
-            let newItems = items + result.news
-            state = .loaded(items: newItems)
-            currentPage += 1
-            hasMorePages = newItems.count < result.totalCount
-        } catch {
-            state = .loaded(items: items)
-            errorSnackMessageSubject.send(error.localizedDescription)
+        Task { [weak self] in
+            guard let self else {
+                return
+            }
+            
+            do {
+                let result = try await networkService.fetchNews(page: currentPage)
+                let newItems = items + result.news
+                state = .loaded(items: newItems)
+                currentPage += 1
+                hasMorePages = newItems.count < result.totalCount
+            } catch {
+                state = .loaded(items: items)
+                errorSnackMessageSubject.send(error.localizedDescription)
+            }
         }
     }
     
-    func refresh() async {
-        await loadFirstPage(isRefreshing: true)
+    func refresh() {
+        loadFirstPage(isRefreshing: true)
     }
     
     func showDetails(for fullUrl: String) {

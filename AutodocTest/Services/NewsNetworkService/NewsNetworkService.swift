@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol NewsNetworkService {
+protocol NewsNetworkService: Sendable {
     func fetchNews(page: Int, pageSize: Int) async throws -> NewsResponse
 }
 
